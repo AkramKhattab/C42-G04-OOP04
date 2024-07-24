@@ -124,6 +124,7 @@ namespace C42_G04_OOP04
 
     #endregion
 
+
     #region Project 2: Maths Class Implementation
 
     public static class Maths
@@ -163,6 +164,7 @@ namespace C42_G04_OOP04
     }
 
     #endregion
+
 
     #region Project 3: Duration Class Implementation
 
