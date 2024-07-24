@@ -1,320 +1,242 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 
-namespace C42_G04_OOP04
+namespace OOPDemo
 {
-    #region Project 1: 3D Point Class Implementation
-
-    public class Point3D : IComparable<Point3D>, ICloneable
+    #region Abstract Class and Method
+    // Abstract class cannot be instantiated and can have abstract methods that must be implemented by derived classes.
+    abstract class Animal
     {
-        // Question 1: Define 3D Point Class and the basic Constructors (use chaining in constructors).
-        public int X { get; set; }
-        public int Y { get; set; }
-        public int Z { get; set; }
+        public abstract void Speak(); // Abstract method
+        public abstract string Name { get; set; } // Abstract property
 
-        public Point3D() : this(0, 0, 0) { }
-
-        public Point3D(int x, int y, int z)
+        public void Sleep() // Non-abstract method
         {
-            X = x;
-            Y = y;
-            Z = z;
+            Console.WriteLine("Sleeping...");
+        }
+    }
+
+    class Dog : Animal
+    {
+        public override void Speak()
+        {
+            Console.WriteLine("Woof!");
         }
 
-        public Point3D(int coordinate) : this(coordinate, coordinate, coordinate) { }
-
-        // Question 2: Override the ToString Function to produce this output: Point Coordinates: (10 10 10).
-        public override string ToString()
+        private string name;
+        public override string Name
         {
-            return $"Point Coordinates: ({X} {Y} {Z})";
+            get { return name; }
+            set { name = value; }
+        }
+    }
+    #endregion
+
+    #region Abstract Class VS Interface
+    // Interface cannot contain any implementation, only definitions.
+    interface IFlyable
+    {
+        void Fly();
+    }
+
+    class Bird : Animal, IFlyable
+    {
+        public override void Speak()
+        {
+            Console.WriteLine("Tweet!");
         }
 
-        // Question 3: Try to use == If (P1 == P2) Does it work properly?
-        public static bool operator ==(Point3D p1, Point3D p2)
+        private string name;
+        public override string Name
         {
-            if (ReferenceEquals(p1, p2))
-            {
-                return true;
-            }
-            if (ReferenceEquals(p1, null) || ReferenceEquals(p2, null))
-            {
-                return false;
-            }
-            return p1.X == p2.X && p1.Y == p2.Y && p1.Z == p2.Z;
+            get { return name; }
+            set { name = value; }
         }
 
-        public static bool operator !=(Point3D p1, Point3D p2)
+        public void Fly()
         {
-            return !(p1 == p2);
+            Console.WriteLine("Flying...");
+        }
+    }
+    #endregion
+
+    #region Operator Overloading
+    class Complex
+    {
+        public int Real { get; set; }
+        public int Imaginary { get; set; }
+
+        public Complex(int real, int imaginary)
+        {
+            Real = real;
+            Imaginary = imaginary;
+        }
+
+        // Overloading the + operator
+        public static Complex operator +(Complex c1, Complex c2)
+        {
+            return new Complex(c1.Real + c2.Real, c1.Imaginary + c2.Imaginary);
+        }
+
+        // Overloading the ++ operator
+        public static Complex operator ++(Complex c)
+        {
+            return new Complex(c.Real + 1, c.Imaginary + 1);
+        }
+
+        // Overloading the == operator
+        public static bool operator ==(Complex c1, Complex c2)
+        {
+            return c1.Real == c2.Real && c1.Imaginary == c2.Imaginary;
+        }
+
+        // Overloading the != operator
+        public static bool operator !=(Complex c1, Complex c2)
+        {
+            return !(c1 == c2);
         }
 
         public override bool Equals(object obj)
         {
-            if (obj == null || GetType() != obj.GetType())
+            if (obj is Complex)
             {
-                return false;
+                Complex c = (Complex)obj;
+                return this == c;
             }
-            Point3D p = (Point3D)obj;
-            return X == p.X && Y == p.Y && Z == p.Z;
+            return false;
         }
 
         public override int GetHashCode()
         {
-            return Tuple.Create(X, Y, Z).GetHashCode();
-        }
-
-        // Question 4: Implement ICloneable interface to be able to clone the object.
-        public object Clone()
-        {
-            return new Point3D(X, Y, Z);
-        }
-
-        // Question 5: Define an array of points and sort this array based on X & Y coordinates.
-        public int CompareTo(Point3D other)
-        {
-            if (other == null)
-                return 1;
-
-            int compareX = X.CompareTo(other.X);
-            if (compareX != 0)
-                return compareX;
-
-            int compareY = Y.CompareTo(other.Y);
-            if (compareY != 0)
-                return compareY;
-
-            return Z.CompareTo(other.Z);
-        }
-
-        public static void Main()
-        {
-            Console.WriteLine("Enter coordinates for point P1:");
-            int x1 = Convert.ToInt32(Console.ReadLine());
-            int y1 = Convert.ToInt32(Console.ReadLine());
-            int z1 = Convert.ToInt32(Console.ReadLine());
-            Point3D P1 = new Point3D(x1, y1, z1);
-
-            Console.WriteLine("Enter coordinates for point P2:");
-            int x2 = Convert.ToInt32(Console.ReadLine());
-            int y2 = Convert.ToInt32(Console.ReadLine());
-            int z2 = Convert.ToInt32(Console.ReadLine());
-            Point3D P2 = new Point3D(x2, y2, z2);
-
-            Console.WriteLine(P1 == P2 ? "Points are equal." : "Points are not equal.");
-
-            List<Point3D> points = new List<Point3D>
-        {
-            P1,
-            P2,
-            new Point3D(3, 2, 1),
-            new Point3D(6, 5, 4),
-            new Point3D(9, 8, 7)
-        };
-
-            points.Sort();
-
-            Console.WriteLine("Sorted points:");
-            foreach (var point in points)
-            {
-                Console.WriteLine(point);
-            }
+            return Real.GetHashCode() ^ Imaginary.GetHashCode();
         }
     }
-
     #endregion
 
-    #region Project 2: Maths Class Implementation
-
-    public static class Maths
+    #region User Defined Casting Operator
+    class Temperature
     {
-        // Question 1: Define Class Maths that has four methods: Add Subtract Multiply and Divide each of them takes two parameters.
-        public static int Add(int a, int b)
+        public double Celsius { get; set; }
+
+        public static implicit operator double(Temperature temp)
         {
-            return a + b;
+            return temp.Celsius;
         }
 
-        public static int Subtract(int a, int b)
+        public static explicit operator Temperature(double d)
         {
-            return a - b;
-        }
-
-        public static int Multiply(int a, int b)
-        {
-            return a * b;
-        }
-
-        public static double Divide(double a, double b)
-        {
-            if (b == 0)
-                throw new DivideByZeroException("Division by zero is not allowed.");
-            return a / b;
-        }
-
-        // Question 2: Call each method in Main().
-        // Question 3: Modify the program so that you do not have to create an instance of class to call the four methods.
-        public static void Main()
-        {
-            Console.WriteLine("Addition: " + Add(5, 3));
-            Console.WriteLine("Subtraction: " + Subtract(5, 3));
-            Console.WriteLine("Multiplication: " + Multiply(5, 3));
-            Console.WriteLine("Division: " + Divide(5, 3));
+            return new Temperature { Celsius = d };
         }
     }
-
     #endregion
 
-    #region Project 3: Duration Class Implementation
-
-    public class Duration
+    #region Static Class, Method, Constructor, Property, Attributes
+    static class MathUtils
     {
-        // Question 1: Define Class Duration To include Three Attributes Hours Minutes and Seconds.
-        public int Hours { get; set; }
-        public int Minutes { get; set; }
-        public int Seconds { get; set; }
+        public static double Pi { get; } = 3.14159;
 
-        // Constructor to initialize with hours, minutes, and seconds (handles Number 3)
-        public Duration(int hours, int minutes, int seconds)
+        static MathUtils() // Static constructor
         {
-            Hours = hours;
-            Minutes = minutes;
-            Seconds = seconds;
+            Console.WriteLine("Static constructor called.");
         }
 
-        // Constructor to initialize with total seconds (handles Number 3)
-        public Duration(int totalSeconds)
+        public static double Square(double number)
         {
-            Hours = totalSeconds / 3600;
-            Minutes = (totalSeconds % 3600) / 60;
-            Seconds = totalSeconds % 60;
+            return number * number;
         }
+    }
+    #endregion
 
-        // Question 2: Override All System.Object Members (ToString, Equals, GetHashCode).
-        public override string ToString()
+    #region Sealed Class, Method, Property
+    sealed class FinalClass
+    {
+        public void Display()
         {
-            return $"Hours: {Hours} Minutes: {Minutes} Seconds: {Seconds}";
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
-            Duration d = (Duration)obj;
-            return Hours == d.Hours && Minutes == d.Minutes && Seconds == d.Seconds;
-        }
-
-        public override int GetHashCode()
-        {
-            return Tuple.Create(Hours, Minutes, Seconds).GetHashCode();
-        }
-
-        // Question 4: Implement All required Operators overloading to enable this Code:
-        public static Duration operator +(Duration d1, Duration d2)
-        {
-            int totalSeconds = (d1.Hours + d2.Hours) * 3600 + (d1.Minutes + d2.Minutes) * 60 + d1.Seconds + d2.Seconds;
-            return new Duration(totalSeconds);
-        }
-
-        public static Duration operator +(Duration d, int seconds)
-        {
-            return new Duration(d.Hours * 3600 + d.Minutes * 60 + d.Seconds + seconds);
-        }
-
-        public static Duration operator +(int seconds, Duration d)
-        {
-            return d + seconds;
-        }
-
-        public static Duration operator ++(Duration d)
-        {
-            return d + 60;
-        }
-
-        public static Duration operator --(Duration d)
-        {
-            return d + (-60);
-        }
-
-        public static Duration operator -(Duration d1, Duration d2)
-        {
-            int totalSeconds = (d1.Hours - d2.Hours) * 3600 + (d1.Minutes - d2.Minutes) * 60 + d1.Seconds - d2.Seconds;
-            return new Duration(totalSeconds);
-        }
-
-        public static bool operator >(Duration d1, Duration d2)
-        {
-            return d1.Hours > d2.Hours || (d1.Hours == d2.Hours && (d1.Minutes > d2.Minutes || (d1.Minutes == d2.Minutes && d1.Seconds > d2.Seconds)));
-        }
-
-        public static bool operator <(Duration d1, Duration d2)
-        {
-            return d2 > d1;
-        }
-
-        public static bool operator >=(Duration d1, Duration d2)
-        {
-            return d1 > d2 || d1 == d2;
-        }
-
-        public static bool operator <=(Duration d1, Duration d2)
-        {
-            return d2 >= d1;
-        }
-
-        public static bool operator ==(Duration d1, Duration d2)
-        {
-            return d1.Equals(d2);
-        }
-
-        public static bool operator !=(Duration d1, Duration d2)
-        {
-            return !d1.Equals(d2);
-        }
-
-        // Question 5: DateTime Obj = (DateTime) D1
-        public static implicit operator DateTime(Duration d)
-        {
-            return new DateTime(1, 1, 1, d.Hours, d.Minutes, d.Seconds);
-        }
-
-        public static void Main()
-        {
-            // Testing constructors (Number 3)
-            Duration D1 = new Duration(11015);
-            Console.WriteLine(D1.ToString()); // Output: Hours: 3 Minutes: 3 Seconds: 35
-
-            Duration D2 = new Duration(7800);
-            Console.WriteLine(D2.ToString()); // Output: Hours: 2 Minutes: 10 Seconds: 0
-
-            // Testing operator overloads (Number 4)
-            Duration D3 = D1 + D2;
-            Console.WriteLine(D3.ToString()); // Combined duration
-
-            D3 = D1 + 7800;
-            Console.WriteLine(D3.ToString()); // Add seconds to duration
-
-            D3 = 666 + D3;
-            Console.WriteLine(D3.ToString()); // Add seconds to duration
-
-            D3 = ++D1;
-            Console.WriteLine(D3.ToString()); // Increment duration by 60 seconds
-
-            D3 = --D2;
-            Console.WriteLine(D3.ToString()); // Decrement duration by 60 seconds
-
-            D1 = D1 - D2;
-            Console.WriteLine(D1.ToString()); // Subtract durations
-
-            Console.WriteLine(D1 > D2); // Comparison
-            Console.WriteLine(D1 <= D2); // Comparison
-
-            // Implicit conversion to DateTime (Number 5)
-            DateTime dt = (DateTime)D1;
-            Console.WriteLine(dt.ToString("HH:mm:ss"));
+            Console.WriteLine("This is a sealed class.");
         }
     }
 
+    class BaseClass
+    {
+        public virtual void Display()
+        {
+            Console.WriteLine("Base class display method.");
+        }
+    }
+
+    class DerivedClass : BaseClass
+    {
+        public sealed override void Display()
+        {
+            Console.WriteLine("Derived class sealed display method.");
+        }
+    }
+
+    class AnotherDerivedClass : DerivedClass
+    {
+        // This will cause a compile error because Display is sealed in DerivedClass
+        // public override void Display()
+        // {
+        //     Console.WriteLine("Another derived class display method.");
+        // }
+    }
     #endregion
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            #region Testing Abstract Class and Method
+            Dog dog = new Dog();
+            dog.Name = "Buddy";
+            Console.WriteLine($"Dog's name is {dog.Name}");
+            dog.Speak();
+            dog.Sleep();
+            #endregion
+
+            #region Testing Abstract Class VS Interface
+            Bird bird = new Bird();
+            bird.Name = "Tweety";
+            Console.WriteLine($"Bird's name is {bird.Name}");
+            bird.Speak();
+            bird.Fly();
+            #endregion
+
+            #region Testing Operator Overloading
+            Complex c1 = new Complex(1, 1);
+            Complex c2 = new Complex(2, 2);
+            Complex c3 = c1 + c2;
+            Console.WriteLine($"c3: {c3.Real} + {c3.Imaginary}i");
+
+            c1++;
+            Console.WriteLine($"c1 after increment: {c1.Real} + {c1.Imaginary}i");
+
+            bool areEqual = c1 == c2;
+            Console.WriteLine($"c1 == c2: {areEqual}");
+            #endregion
+
+            #region Testing User Defined Casting Operator
+            Temperature temp = new Temperature { Celsius = 37.5 };
+            double tempInDouble = temp; // Implicit cast
+            Console.WriteLine($"Temperature in double: {tempInDouble}");
+
+            Temperature newTemp = (Temperature)98.6; // Explicit cast
+            Console.WriteLine($"Temperature in Celsius: {newTemp.Celsius}");
+            #endregion
+
+            #region Testing Static Class, Method, Constructor, Property, Attributes
+            Console.WriteLine($"Pi: {MathUtils.Pi}");
+            double number = 5;
+            double square = MathUtils.Square(number);
+            Console.WriteLine($"Square of {number}: {square}");
+            #endregion
+
+            #region Testing Sealed Class, Method, Property
+            FinalClass finalClass = new FinalClass();
+            finalClass.Display();
+
+            DerivedClass derivedClass = new DerivedClass();
+            derivedClass.Display();
+            #endregion
+        }
+    }
 }
